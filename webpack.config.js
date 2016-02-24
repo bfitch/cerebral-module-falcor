@@ -3,7 +3,7 @@ module.exports = {
     app: ["./src/index.js"]
   },
   output: {
-    library: 'nodePrototyper',
+    library: 'cerebralModuleFalcor',
     libraryTarget: 'commonjs2',
     filename: 'dist/index.js'
   },

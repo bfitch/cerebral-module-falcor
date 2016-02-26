@@ -1,59 +1,70 @@
 import React from 'react';
 import falcorPathSyntax from 'falcor-path-syntax';
 import falcorPathUtils from 'falcor-path-utils';
-import {isFunction,get,isEqual} from 'lodash';
-import {v4 as uuid} from 'uuid';
+import {isFunction,get,isEqual,isObject} from 'lodash';
 import alias from '../../misc/alias';
 
 export default function Decorator(decoratorProps) {
   return function (Component) {
+    function generateId() {
+      return `${Component.name || 'UNKNOWN'}_query_${Math.random().toString(36).slice(-8)}`;
+    }
+
     return React.createClass({
       contextTypes: {
         controller: React.PropTypes.object
       },
       componentWillMount() {
+        if(!this.props.signals || !this.props.modules){
+          throw new Error('Falcor decorator must come after Cerebral decorator.');
+        }
+
         const {controller} = this.context;
         controller.on('change', this.update);
 
-        const isArr = Array.isArray(decoratorProps);
         const isFunc = isFunction(decoratorProps);
+        const queries = isFunc ? decoratorProps(this.props) : decoratorProps;
 
-        if (!isArr && !isFunc) {
-          throw new Error(`Falcor decorator must be passed an array of queries or a function producing such an array. Query ${JSON.stringify(decoratorProps, null, 2)}.`);
+        if (!Array.isArray(queries)) {
+          const errorMessage = [
+            `Component '${Component.name}' use of Falcor decorator is invalid.`,
+            `Must be passed an array of queries or a function producing such an array. Query ${JSON.stringify(decoratorProps, null, 2)}.`
+          ].join('\n');
+          throw new Error(errorMessage);
         }
 
-        const guid = uuid();
-        const queries = (isFunc ? decoratorProps(this.props) : decoratorProps).sort();
-        const queryInfo = {guid, queries};
+        const guid = generateId();
 
+        this.queryInfo = {guid,queries};
         const {registerQuery,batchQuery} = this.getFalcorSignals();
-        registerQuery(queryInfo);
+        registerQuery(this.queryInfo);
         batchQuery();
 
-        this.queryInfo = queryInfo;
+        const self = this;
+
         this.setState({
-          falcor: (jsonPath = '', defaultValue) => defaultValue,
-          queryInfo
+          falcorJSON:null,
+          falcor(path, defaultValue){
+            const json = self.state.falcorJSON;
+            return !path ? json : get(self.state.falcorJSON, path, defaultValue);
+          }
         });
       },
       componentWillUpdate(nextProps, nextState){
         const oldQueries = get(this, 'queryInfo.queries', null);
-        const nextQueries = (isFunction(decoratorProps) ? decoratorProps(nextProps) : decoratorProps).sort();
+        const nextQueries = (isFunction(decoratorProps) ? decoratorProps(nextProps) : decoratorProps);
 
         if (!isEqual(oldQueries, nextQueries)) {
           const newQueryInfo = {
-            guid: uuid(),
+            guid: generateId(),
             queries: nextQueries
           };
 
-          const {replaceQueries} = this.getFalcorSignals();
-
-          replaceQueries({
-            oldGuid: this.queryInfo.guid,
-            nextQueryInfo: newQueryInfo
-          });
-
+          const {unregisterQuery, registerQuery,batchQuery} = this.getFalcorSignals();
+          unregisterQuery({guid:this.queryInfo.guid});
           this.queryInfo = newQueryInfo;
+          registerQuery(this.queryInfo);
+          batchQuery();
         }
       },
       componentWillUnmount(){
@@ -73,18 +84,19 @@ export default function Decorator(decoratorProps) {
         return signals;
       },
       update() {
-        if (this.isMounted()) {
+        if (this.isMounted() && this.queryInfo) {
+          const {guid} = this.queryInfo;
           const {controller} = this.context;
           const moduleName = controller.getModules()[alias].name;
-          // Check if the state you are looking for has changed and
-          const json = controller.get([moduleName, 'json']);
+          const info = controller.get([moduleName, 'queries', guid]);
 
-          this.setState({
-            falcor(jsonPath = '', defaultValue){
-              if (!jsonPath.length) return json;
-              return get(json || {}, jsonPath, defaultValue);
+          if (info && info.json) {
+            if(!isEqual(this.state.falcorJSON,info.json)){
+              this.setState({
+                falcorJSON: info.json
+              });
             }
-          });
+          }
         }
       },
       render: function () {

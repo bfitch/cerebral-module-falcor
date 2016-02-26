@@ -2,7 +2,7 @@ import falcor from 'falcor';
 import HTTPDataSource from 'falcor-http-datasource';
 
 export function initializeServices(module, options) {
-  const {initialState, dataSource, disableTimeout} = options;
+  const {initialState, dataSource, disableTimeout, batchMs} = options;
 
   const falcorModel = new falcor.Model({
     cache: initialState,
@@ -10,16 +10,19 @@ export function initializeServices(module, options) {
     onChange: module.getSignals().batchQuery
   });
 
+  const model = batchMs ? falcorModel.batch(batchMs) : falcorModel;
+
   const falcorServices = {
-    get(query) {
+    async get(pathSets) {
       // Falcor's model get api doesn't match the docs.
       // Its not an Array.<PathSet> but actually (pathSet1,pathSet2,pathSetN)
       // this total makes sense or not, als;kdfjfas ldfkjasoeifju saleknmncl
-      return falcorModel.get(...query);
+      const results = await model.get(...pathSets);
+      return results;
     },
 
     set(jsonGraph){
-      return falcorModel.set(jsonGraph);
+      return model.set(jsonGraph);
     },
 
     call(functionPath, args = [], refSuffixes = [], thisPaths = []) {
@@ -27,16 +30,11 @@ export function initializeServices(module, options) {
       // args         - {Array.<Object>}  the arguments to pass to the function
       // refSuffixes  - {Array.<PathSet>} paths to retrieve from the targets of JSONGraph References in the function's response.
       // thisPaths    - {Array.<PathSet>} paths to retrieve from function's this object after successful function execution
-      return falcorModel.call(functionPath, args, refSuffixes, thisPaths);
+      return model.call(functionPath, args, refSuffixes, thisPaths);
     },
 
-    getLocal(query){
-      return falcorModel.getCache(...query);
-    },
-
-    setLocal(jsonGraph){
-      const model = falcorModel.setCache(jsonGraph);
-      return model;
+    invalidate(paths){
+      return model.invalidate(...paths);
     }
   };
 

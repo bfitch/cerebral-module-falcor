@@ -6,4 +6,3 @@ export function generateQueryPath(query){
   const queryPath = ['queries', queryString];
   return queryPath;
 }
-

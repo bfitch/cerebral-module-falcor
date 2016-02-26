@@ -1,4 +1,4 @@
-import 'babel-polyfill';
+import {isUndefined} from 'lodash';
 import {set,debounce} from 'cerebral-addons';
 import batchQueryAsyncAction from '../actions/batchQuery';
 import alias from '../misc/alias';
@@ -9,11 +9,15 @@ const batchQuery = [
     batchQueryAsyncAction,
     {
       success: [
-        ({input,modules,state})=> {
-          const {json,optimizedQuery} = input;
+        ({input:{componentQueryResults} ,modules,state})=> {
           const falcorModule = modules[alias];
           const falcorState = state.select(falcorModule.path);
-          falcorState.merge({json,optimizedQuery});
+
+          componentQueryResults.forEach(({componentId,json})=>{
+            const path = `queries.${componentId}.json`;
+            const value = json || {};
+            falcorState.set(path, value);
+          });
         }
       ],
       error: [

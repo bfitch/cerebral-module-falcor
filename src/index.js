@@ -1,6 +1,7 @@
 import alias from './misc/alias';
 import warning from './misc/warning';
-import {batchQuery,call,registerQuery,unregisterQuery,replaceQueries} from './signals';
+
+import { batchQuery,call,registerQuery,unregisterQuery, replaceQueries} from './signals';
 import {initializeServices} from './services';
 
 export default (options = {})=> {
@@ -25,7 +26,8 @@ export default (options = {})=> {
       initialState: {},
       dataSource: '/model.json',
       verbose: true,
-      disableTimeout: true
+      disableTimeout: true,
+      batchMs: 10
     }, options);
 
     const {falcorModel,falcorServices} = initializeServices(module, fullOptions);

@@ -15,7 +15,7 @@ export default function Decorator(decoratorProps) {
         controller: React.PropTypes.object
       },
       componentWillMount() {
-        if(!this.props.signals || !this.props.modules){
+        if (!this.props.signals || !this.props.modules) {
           throw new Error('Falcor decorator must come after Cerebral decorator.');
         }
 
@@ -35,7 +35,7 @@ export default function Decorator(decoratorProps) {
 
         const guid = generateId();
 
-        this.queryInfo = {guid,queries};
+        this.queryInfo = {guid, queries};
         const {registerQuery,batchQuery} = this.getFalcorSignals();
         registerQuery(this.queryInfo);
         batchQuery();
@@ -43,7 +43,7 @@ export default function Decorator(decoratorProps) {
         const self = this;
 
         this.setState({
-          falcorJSON:null,
+          falcorJSON: null,
           falcor(path, defaultValue){
             const json = self.state.falcorJSON;
             return !path ? json : get(self.state.falcorJSON, path, defaultValue);
@@ -61,7 +61,7 @@ export default function Decorator(decoratorProps) {
           };
 
           const {unregisterQuery, registerQuery,batchQuery} = this.getFalcorSignals();
-          unregisterQuery({guid:this.queryInfo.guid});
+          unregisterQuery({guid: this.queryInfo.guid});
           this.queryInfo = newQueryInfo;
           registerQuery(this.queryInfo);
           batchQuery();
@@ -91,7 +91,7 @@ export default function Decorator(decoratorProps) {
           const info = controller.get([moduleName, 'queries', guid]);
 
           if (info && info.json) {
-            if(!isEqual(this.state.falcorJSON,info.json)){
+            if (!isEqual(this.state.falcorJSON, info.json)) {
               this.setState({
                 falcorJSON: info.json
               });

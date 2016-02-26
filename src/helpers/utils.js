@@ -1,8 +1,8 @@
-export function falcorMap(falcorObject,callback){
+export function falcorMap(falcorObject, callback) {
   let i = 0;
   const results = [];
 
-  while(true) {
+  while (true) {
     const node = falcorObject[i++];
     if (node) {
       results.push(callback(node, i));

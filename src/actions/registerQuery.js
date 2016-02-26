@@ -4,7 +4,7 @@ import falcorPathUtils from 'falcor-path-utils';
 import {generateQueryPath} from '../misc/utils';
 import alias from '../misc/alias';
 
-export default function registerQuery({input,state,modules}){
+export default function registerQuery({input,state,modules}) {
   const {guid,queries,defaults} = input;
 
   if (!Array.isArray(queries)) {
@@ -12,11 +12,10 @@ export default function registerQuery({input,state,modules}){
   }
 
   const falcorModule = modules[alias];
-  const queriesState = state.select([...falcorModule.path,'queries']);
+  const queriesState = state.select([...falcorModule.path, 'queries']);
 
   //const convertedToPathSets = queries.map(falcorPathSyntax.fromPath);
   //const collapsedPathSets =  falcorPathUtils.collapse(convertedToPathSets);
 
-  //queriesState.set(guid,{pathSets:collapsedPathSets,json:{}});
-  queriesState.set(guid,{pathSets:queries,json:{}});
+  queriesState.set(guid, {pathSets: queries, json: {}});
 }

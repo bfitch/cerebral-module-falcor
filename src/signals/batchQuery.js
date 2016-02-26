@@ -4,7 +4,7 @@ import batchQueryAsyncAction from '../actions/batchQuery';
 import alias from '../misc/alias';
 
 const batchQuery = [
-  set('state:/falcor.lastUpdated',(new Date()).getTime()),
+  set('state:/falcor.lastUpdated', (new Date()).getTime()),
   [
     batchQueryAsyncAction,
     {
@@ -13,7 +13,7 @@ const batchQuery = [
           const falcorModule = modules[alias];
           const falcorState = state.select(falcorModule.path);
 
-          componentQueryResults.forEach(({componentId,json})=>{
+          componentQueryResults.forEach(({componentId,json})=> {
             const path = `queries.${componentId}.json`;
             const value = json || {};
             falcorState.set(path, value);

@@ -2,6 +2,7 @@ import alias from './misc/alias';
 import warning from './misc/warning';
 import {batchQuery,call,registerQuery,unregisterQuery,replaceQueries} from './signals';
 import {initializeServices} from './services';
+import Decorator from './helpers/react/decorator';
 
 export default (options = {})=> {
   return (module, controller)=> {
@@ -35,3 +36,5 @@ export default (options = {})=> {
     return meta;
   }
 }
+
+export {Decorator};

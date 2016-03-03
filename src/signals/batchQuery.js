@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import {set,debounce} from 'cerebral-addons';
 import batchQueryAsyncAction from '../actions/batchQuery';
 import alias from '../misc/alias';

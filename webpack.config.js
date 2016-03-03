@@ -7,6 +7,14 @@ module.exports = {
     libraryTarget: 'commonjs2',
     filename: 'dist/index.js'
   },
+  externals: {
+    falcor: 'falcor',
+    react: 'react'
+  },
+  resolve: {
+    alias: { falcor: "falcor/dist/falcor.browser.js" },
+    extensions: ["", ".js"]
+  },
   module: {
     loaders: [
       {
@@ -16,10 +24,11 @@ module.exports = {
         query: {
           presets: ['es2015', 'react', 'stage-0']
         }
+      },
+      {
+        test: require.resolve("uuid/rng-browser.js"),
+        loader: "imports?global=>window"
       }
     ]
-  },
-  resolve: {
-    extensions: ["", ".js"]
   }
 };

@@ -1,4 +1,7 @@
-import Decorator from './decorator';
-import testComponentGenerator from './testComponentGenerator';
+var Decorator = require('./decorator');
+var testComponentGenerator = require('./testComponentGenerator');
 
-export {Decorator,testComponentGenerator}
+module.exports = {
+  Decorator: Decorator,
+  testComponentGenerator: testComponentGenerator
+};

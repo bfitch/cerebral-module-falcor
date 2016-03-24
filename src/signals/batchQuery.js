@@ -1,27 +1,34 @@
-import {set,debounce} from 'cerebral-addons';
-import batchQueryAsyncAction from '../actions/batchQuery';
-import alias from '../misc/alias';
+var set = require('cerebral-addons/set');
+var debounce = require('cerebral-addons/debounce');
+var batchQueryAsyncAction = require('../actions/batchQuery');
+var alias = require('../misc/alias');
 
-const batchQuery = [
+var batchQuery = [
   set('state:/falcor.lastUpdated',(new Date()).getTime()),
   [
     batchQueryAsyncAction,
     {
       success: [
-        ({input,modules,state})=> {
-          const {json,optimizedQuery} = input;
-          const falcorModule = modules[alias];
-          const falcorState = state.select(falcorModule.path);
-          falcorState.merge({json,optimizedQuery});
+        function (context) {
+          var input = context.input;
+          var modules = context.modules;
+          var state = context.state;
+
+          var json = input.json;
+          var optimizedQuery = input.optimizedQuery;
+          var falcorModule = modules[alias];
+          var falcorState = state.select(falcorModule.path);
+          console.log(input);
+          falcorState.merge({json: json,optimizedQuery: optimizedQuery});
         }
       ],
       error: [
-        e=> {
+        function (e) {
           console.error(e);
-          debugger;
         }
       ]
     }
   ]
 ];
-export default batchQuery;
+
+module.exports = batchQuery;

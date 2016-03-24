@@ -1,7 +1,7 @@
-import unregisterQueryAction from '../actions/unregisterQuery'
+var unregisterQueryAction = require('../actions/unregisterQuery');
 
-const unregisterQuery = [
+var unregisterQuery = [
   unregisterQueryAction
 ];
 
-export default unregisterQuery;
+module.exports = unregisterQuery;

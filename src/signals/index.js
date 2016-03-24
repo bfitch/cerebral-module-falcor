@@ -1,13 +1,13 @@
-import batchQuery from './batchQuery';
-import call from './call';
-import registerQuery from './registerQuery';
-import unregisterQuery from './unregisterQuery';
-import replaceQueries from './replaceQueries';
+var batchQuery = require('./batchQuery');
+var call = require('./call');
+var registerQuery = require('./registerQuery');
+var unregisterQuery = require('./unregisterQuery');
+var replaceQueries = require('./replaceQueries');
 
-export {
-  batchQuery,
-  call,
-  registerQuery,
-  unregisterQuery,
-  replaceQueries
+module.exports = {
+  batchQuery: batchQuery,
+  call: call,
+  registerQuery: registerQuery,
+  unregisterQuery: unregisterQuery,
+  replaceQueries: replaceQueries
 };

@@ -1,31 +1,41 @@
-import alias from '../misc/alias';
+var alias = require('../misc/alias');
 
+function call(context) {
+  var input = context.input;
+  var output = context.output;
+  var modules = context.modules;
 
-export default async function call({input, output, modules}) {
-  try {
-    const {falcor} = input;
-    const {path, args, refSuffixes = [], thisPaths = [],debug=true,verbose=true} = falcor;
+  var falcor = input.falcor;
+  var path = falcor.path;
+  var args = input.args;
+  var refSuffixes = input.refSuffixes || [];
+  var thisPaths = input.thisPaths || [];
+  var debug = input.debug || true;
+  var verbose = input.verbose || true;
 
-    if (!path || !args) throw new Error(`Invalid falcor inputs.`);
-    const arrayedArgs = Array.isArray(args) ? args : [args];
-    const fullPath = Array.isArray(path) ? path : [path];
+  if (!path || !args) = throw new Error('Invalid falcor inputs.');
+  var arrayedArgs = Array.isArray(args) ? args : [args];
+  var fullPath = Array.isArray(path) ? path : [path];
 
-    let response = await modules[alias].services.call(
-      fullPath,
-      arrayedArgs,
-      refSuffixes,
-      thisPaths
-    );
-
-    //If your is returns just invalidations to the cache there will be a null response
+  modules[alias].services.call(
+    fullPath,
+    arrayedArgs,
+    refSuffixes,
+    thisPaths
+  ).then(function (response) {
     if (!response) response = {json: {}};
 
     if (output.success) output.success(response.json);
     else output(response.json);
-  }
-  catch (e) {
-    if (verbose) console.error(e);
+  })
+  .catch(function (err) {
+    if (verbose) console.error(err);
     if (debug) debugger;
-    output.error(e);
-  }
+    output.error(err);
+  });
+
 }
+
+call.async = true;
+
+module.exports = call;

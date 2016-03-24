@@ -1,7 +1,7 @@
-import registerQueryAction  from '../actions/registerQuery'
+var registerQueryAction = require('../actions/registerQuery');
 
-const registerQuery = [
+var registerQuery = [
   registerQueryAction
 ];
 
-export default registerQuery;
+module.exports = registerQuery;

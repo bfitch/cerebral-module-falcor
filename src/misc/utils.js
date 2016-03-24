@@ -1,9 +1,10 @@
-import falcorPathSyntax from 'falcor-path-syntax';
+var falcorPathSyntax = require('falcor-path-syntax');
 
-export function generateQueryPath(query){
-  const pathSet = falcorPathSyntax.fromPath(query);
-  const queryString = JSON.stringify(pathSet);
-  const queryPath = ['queries', queryString];
-  return queryPath;
+module.exports = {
+  generateQueryPath: function (query){
+    var pathSet = falcorPathSyntax.fromPath(query);
+    var queryString = JSON.stringify(pathSet);
+    var queryPath = ['queries', queryString];
+    return queryPath;
+  }
 }
-

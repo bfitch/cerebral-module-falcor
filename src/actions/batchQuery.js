@@ -1,29 +1,32 @@
-import falcorPathUtils from 'falcor-path-utils';
-import alias from '../misc/alias';
-import {get,values,flatten} from 'lodash'
+var falcorPathUtils = require('falcor-path-utils');
+var alias = require('../misc/alias');
+var _ = require('lodash');
 
-export default async function batchQuery({input,modules,state,output}){
-  try {
-    const {verbose=false} = input;
-    const falcorModule = modules[alias];
-    const queriesState = state.select([...falcorModule.path,'queries']);
-    const allQueries = flatten(values(queriesState.get()));
-    const optimizedQuery = falcorPathUtils.collapse(allQueries);
+function batchQuery(context){
+  var input = context.input;
+  var modules = context.modules;
+  var state = context.state;
+  var output = context.output;
 
-    let json=null;
+  var verbose = input.verbose || false;
+  var falcorModule = modules[alias];
+  var queriesState = state.select(falcorModule.path.concat('queries'));
+  var allQueries = _.flatten(_.values(queriesState.get()));
+  var optimizedQuery = falcorPathUtils.collapse(allQueries);
 
-    if(optimizedQuery.length){
-      if (verbose) console.log(`Falcor combined query: ${JSON.stringify(optimizedQuery)}`);
-      const results = await falcorModule.services.get(optimizedQuery);
-      json = get(results, 'json', null);
-      if (!json) debugger;
-    }
-
-    output.success({json,optimizedQuery});
-  }
-  catch (e) {
-    console.error(e);
-    debugger;
-    output.error(e);
+  if (optimizedQuery.length) {
+    if (verbose) console.log('Falcor combined query: ' + JSON.stringify(optimizedQuery));
+    falcorModule.services.get(optimizedQuery)
+      .then(function (results) {
+        var json = _.get(results, 'json', null);
+        output.success({json,optimizedQuery});
+      })
+      .catch(function (err) {
+        output.error(err);
+      });
   }
 }
+
+batchQuery.async = true;
+
+module.exports = batchQuery;

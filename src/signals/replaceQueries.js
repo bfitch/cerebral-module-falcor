@@ -1,7 +1,7 @@
-import replaceQueriesAction from '../actions/replaceQueries'
+var replaceQueriesAction = require('../actions/replaceQueries');
 
-const replaceQueries = [
+var replaceQueries = [
   replaceQueriesAction
 ];
 
-export default replaceQueries;
+module.exports = replaceQueries;

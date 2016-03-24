@@ -1,15 +1,15 @@
-import callAsyncAction from '../actions/call';
+var callAsyncAction = '../actions/call';
 
 const call = [
   callAsyncAction,
   {
     success: [],
     error: [
-      (e)=> {
+      function (e) {
         debugger;
       }
     ]
   }
 ];
 
-export default call;
+module.exports = call;

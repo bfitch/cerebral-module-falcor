@@ -1,8 +1,11 @@
-import React, {Component} from 'react';
-import {Decorator as Cerebral} from 'cerebral-view-react';
-import Decorator from './decorator'
+var React = require('react');
+var Component = React.Component;
+var Cerebral = require('cerebral-view-react').Decorator;
+var Decorator = require('./decorator');
 
-export default function TestComponentGenerator(queries,subPath='') {
+/*
+module.exports = function TestComponentGenerator(queries,subPath='') {
+
   @Cerebral()
   @Decorator(queries)
   class FalcorTester extends Component {
@@ -21,3 +24,4 @@ export default function TestComponentGenerator(queries,subPath='') {
   }
   return FalcorTester;
 }
+*/

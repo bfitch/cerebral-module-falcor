@@ -1,2 +1,2 @@
-const alias = 'cerebral-module-falcor';
-export default alias;
+var alias = 'cerebral-module-falcor';
+module.exports = alias;

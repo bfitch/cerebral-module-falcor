@@ -1,11 +1,12 @@
-import alias from './misc/alias';
-import warning from './misc/warning';
-import {batchQuery,call,registerQuery,unregisterQuery,replaceQueries} from './signals';
-import {initializeServices} from './services';
-import Decorator from './helpers/react/decorator';
+var alias = require('./misc/alias');
+var warning = require('./misc/warning');
+var signals = require('./signals');
+var services = require('./services');
+var Decorator = require('./helpers/react/decorator');
 
-export default (options = {})=> {
-  return (module, controller)=> {
+var moduleExport = function (options) {
+  options = options || {};
+  return function (module, controller) {
     module.alias(alias);
 
     module.addState({
@@ -15,26 +16,34 @@ export default (options = {})=> {
     });
 
     module.addSignals({
-      batchQuery,
-      call,
-      registerQuery,
-      unregisterQuery,
-      replaceQueries
+      batchQuery: signals.batchQuery,
+      call: signals.call,
+      registerQuery: signals.registerQuery,
+      unregisterQuery: signals.unregisterQuery,
+      replaceQueries: signals.replaceQueries
     });
 
-    const fullOptions = Object.assign({
+    var fullOptions = Object.keys(options).reduce(function (fullOptions, key) {
+      fullOptions[key] = options[key];
+      return fullOptions;
+    }, {
       initialState: {},
       dataSource: '/model.json',
       verbose: true,
       disableTimeout: true
-    }, options);
+    });
 
-    const {falcorModel,falcorServices} = initializeServices(module, fullOptions);
-    module.addServices(falcorServices);
+    var initializedServices = services.initializeServices(module, fullOptions);
+    module.addServices(initializedServices.falcorServices);
 
-    const meta = {warning, falcorModel};
+    var meta = {
+      warning: warning,
+      falcorModel: initializedServices.falcorModel
+    };
     return meta;
   }
 }
 
-export {Decorator};
+moduleExport.Decorator = Decorator;
+
+module.exports = moduleExport;

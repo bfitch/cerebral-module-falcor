@@ -1,2 +1,2 @@
-const warning = 'Falcor module is super experimental, use at your own risk!';
-export default warning;
+var warning = 'Falcor module is super experimental, use at your own risk!';
+module.exports = warning;
